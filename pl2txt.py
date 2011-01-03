@@ -8,13 +8,14 @@
 # http://www.ericdaugherty.com/dev/itunesexport/
 
 # For now the format of the file will be a null means an indent
-# FIXME: this should be changed for unico(de
+# FIXME: this should be changed for unicode
 
 import os, sys, string
 from findcommon import FindCommonStart
 
 INPUT_DIR = "playlists"
 
+# FIXME: this ignores http references
 class Playlist:
     __songnames = []
     __index = 0
@@ -23,7 +24,7 @@ class Playlist:
         filename = os.path.join(INPUT_DIR, playlistfilename)
         f = open(filename)
         for line in f.readlines():
-            if line[0] != '#':
+            if line[0] != '#' and line.startswith("http://") != True:
                 self.__songnames.append(line.strip())
         f.close()
         self.__index = len(self.__songnames)
@@ -77,6 +78,10 @@ for playlist in fileList:
 print("Found %d songs" % (len(songtoplaylists)))
 # search for the common start string (path to the original files)
 fcs = FindCommonStart()
+pdone = 0
+pinc = 100 / len(songtoplaylists)
 for key in songtoplaylists.keys():
     fcs.processString(key)
+    pdone = pdone + pinc
+    status(pdone)
 print("Common Start: %s" % (fcs.getCommon()))
