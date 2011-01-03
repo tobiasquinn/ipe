@@ -10,8 +10,11 @@ class FindCommonStart:
         elif string.startswith(self.__common):
             return
         else:
-            print("New common start current count is %d" % (len(self.__common)))
-            # find the furthest point our input string 
+            # find the furthest common piece of the input string
+            slicepoint = len(string)
+            while (self.__common[:slicepoint].find(string) != 0):            
+                slicepoint = slicepoint - 1
+            self.__common = self.__common[:slicepoint]
 
     def getCommon(self):
         return self.__common
