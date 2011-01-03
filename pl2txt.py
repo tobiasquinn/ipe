@@ -78,10 +78,6 @@ for playlist in fileList:
 print("Found %d songs" % (len(songtoplaylists)))
 # search for the common start string (path to the original files)
 fcs = FindCommonStart()
-pdone = 0
-pinc = 100 / len(songtoplaylists)
 for key in songtoplaylists.keys():
     fcs.processString(key)
-    pdone = pdone + pinc
-    status(pdone)
 print("Common Start: %s" % (fcs.getCommon()))

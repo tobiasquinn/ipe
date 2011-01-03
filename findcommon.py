@@ -11,8 +11,8 @@ class FindCommonStart:
             return
         else:
             # find the furthest common piece of the input string
-            slicepoint = len(string)
-            while (self.__common[:slicepoint].find(string) != 0):            
+            slicepoint = len(self.__common)
+            while (string.find(self.__common[:slicepoint]) != 0):
                 slicepoint = slicepoint - 1
             self.__common = self.__common[:slicepoint]
 
