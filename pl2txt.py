@@ -17,26 +17,24 @@ INPUT_DIR = "playlists"
 
 # FIXME: this ignores http references
 class Playlist:
-    __songnames = []
-    __index = 0
-
     def __init__(self, playlistfilename):
+        self._songnames = []    
         filename = os.path.join(INPUT_DIR, playlistfilename)
         f = open(filename)
         for line in f.readlines():
             if line[0] != '#' and line.startswith("http://") != True:
-                self.__songnames.append(line.strip())
+                self._songnames.append(line.strip())
         f.close()
-        self.__index = len(self.__songnames)
+        self._index = len(self._songnames)
 
     def __iter__(self):
         return self
 
     def __next__(self):
-        if self.__index == 0:
+        if self._index == 0:
             raise StopIteration
-        self.__index = self.__index - 1
-        return self.__songnames[self.__index]
+        self._index = self._index - 1
+        return self._songnames[self._index]
 
 
 #pl = Playlist("Jazz Masters 41.m3u")
@@ -63,8 +61,6 @@ songtoplaylists = {}
 
 # map songs to all the playlists they are in
 # this is done by creating a dictionary of songname to playlist name
-pdone = 0
-pinc = 100 / len(fileList)
 for playlist in fileList:
     pl = Playlist(playlist)
     for song in pl:
@@ -72,12 +68,27 @@ for playlist in fileList:
             songtoplaylists[song] = [playlist]
         else:
             songtoplaylists[song].append(playlist)
-    pdone = pdone + pinc
-    status(pdone)
 
 print("Found %d songs" % (len(songtoplaylists)))
 # search for the common start string (path to the original files)
 fcs = FindCommonStart()
 for key in songtoplaylists.keys():
     fcs.processString(key)
-print("Common Start: %s" % (fcs.getCommon()))
+commonsongstart = fcs.getCommon()
+print("Common Start: %s" % (commonsongstart))
+
+# remove the common start string from each song entry
+renamesong = lambda songname: songname[len(commonsongstart):]
+newsongtoplaylists = dict((renamesong(key), value) for (key, value) in songtoplaylists.items())
+
+testsong = ["Diana Krall/Love Scenes [Europe]/11 My Love Is.m4a",
+           "Compilations/I Hear Music - Cleo Laine & John Dankworth - A Celebration Of Their Life & Work - [Disc 2] John - Big Band & The Movies/2-06 African Waltz.m4a",
+           "Alicia De Larrocha/Albéniz (I)_ Iberia, Navarra, Suite Española [Disc 2]/2-12 Albéniz (I)_ Suite Española - Castilla (Seguidillas).m4a"]
+for song in testsong:
+    print("SONG: %s" % song)
+    print("\t%s" % newsongtoplaylists[song])
+
+# now there is a map of songs to playlists which we can build the playlist tree
+# from as a child of a parent playlist contains all the songs of the node
+# underneath
+
