@@ -108,7 +108,7 @@ def walktree(rootnode, visit):
     nextChildIndex = 0
 
     while True:
-        visit(cur.getLabel())
+        visit(cur)
 
         while nextChildIndex >= cur.getNumberOfChildren() and cur is not rootnode:
             nextChildIndex = cur.getParent().getIndex(cur) + 1
@@ -120,7 +120,20 @@ def walktree(rootnode, visit):
         cur = cur.getChild(nextChildIndex)
         nextChildIndex = 0
 
+def printnode(node):
+    d = node.getDepth()
+    s = ''
+    if (d != 0):
+        s += '\\'
+        s += ('==' * (d + 1))
+        s += '>'
+    print("%s%s" % (s, node.getLabel()))
+
 rootnode = NodePlaylist("Root")
 for ps in uniqueset:
-    rootnode.addChild(NodePlaylist(ps))
-walktree(rootnode, print)
+    if len(ps) == 1:
+        rootnode.addChild(NodePlaylist(ps))
+for ps in uniqueset:
+    if len(ps) == 2:
+        rootnode.getChild(0).addChild(NodePlaylist(ps))
+walktree(rootnode, printnode)
