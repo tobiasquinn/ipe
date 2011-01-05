@@ -12,6 +12,7 @@
 
 import os, sys, string
 from findcommon import FindCommonStart
+from nodes import NodePlaylist
 
 INPUT_DIR = "playlists"
 
@@ -33,7 +34,7 @@ class Playlist:
     def __next__(self):
         if self._index == 0:
             raise StopIteration
-        self._index = self._index - 1
+        self._index -= 1
         return self._songnames[self._index]
 
 
@@ -81,14 +82,45 @@ print("Common Start: %s" % (commonsongstart))
 renamesong = lambda songname: songname[len(commonsongstart):]
 newsongtoplaylists = dict((renamesong(key), value) for (key, value) in songtoplaylists.items())
 
-testsong = ["Diana Krall/Love Scenes [Europe]/11 My Love Is.m4a",
-           "Compilations/I Hear Music - Cleo Laine & John Dankworth - A Celebration Of Their Life & Work - [Disc 2] John - Big Band & The Movies/2-06 African Waltz.m4a",
-           "Alicia De Larrocha/Albéniz (I)_ Iberia, Navarra, Suite Española [Disc 2]/2-12 Albéniz (I)_ Suite Española - Castilla (Seguidillas).m4a"]
-for song in testsong:
-    print("SONG: %s" % song)
-    print("\t%s" % newsongtoplaylists[song])
+#testsong = ["Diana Krall/Love Scenes [Europe]/11 My Love Is.m4a",
+#           "Compilations/I Hear Music - Cleo Laine & John Dankworth - A Celebration Of Their Life & Work - [Disc 2] John - Big Band & The Movies/2-06 African Waltz.m4a",
+#           "Alicia De Larrocha/Albéniz (I)_ Iberia, Navarra, Suite Española [Disc 2]/2-12 Albéniz (I)_ Suite Española - Castilla (Seguidillas).m4a"]
+#
+#testsong = ["Charlie Christian/Charlie's Dream—The Original Guitar Genius (Disc 2)/2-07 As Long As I Live.m4a",
+#            "Compilations/Flying Home—The Original Guitar Genius (Disc 1)/1-10 AC_DC Current.m4a"]
 
-# now there is a map of songs to playlists which we can build the playlist tree
-# from as a child of a parent playlist contains all the songs of the node
-# underneath
+# We want to turn each song to playlists in a set
+# then produce a set so that we have a unqiue list of all playlist paths
+# which we can then convert into a tree
+uniqueset = set()
+psetcount = 0
+for playlists in newsongtoplaylists.values():
+    psetcount += 1
+    pset = frozenset(playlists)
+    if pset not in uniqueset:
+        uniqueset.add(pset)
+print("Playlists sets =", psetcount)
+print("Unique Playlists sets =", len(uniqueset))
 
+# print out all nodes from the root node
+def walktree(rootnode, visit):
+    cur = rootnode
+    nextChildIndex = 0
+
+    while True:
+        visit(cur.getLabel())
+
+        while nextChildIndex >= cur.getNumberOfChildren() and cur is not rootnode:
+            nextChildIndex = cur.getParent().getIndex(cur) + 1
+            cur = cur.getParent()
+
+        if nextChildIndex >= cur.getNumberOfChildren():
+            break
+
+        cur = cur.getChild(nextChildIndex)
+        nextChildIndex = 0
+
+rootnode = NodePlaylist("Root")
+for ps in uniqueset:
+    rootnode.addChild(NodePlaylist(ps))
+walktree(rootnode, print)
