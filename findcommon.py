@@ -13,7 +13,7 @@ class FindCommonStart:
             # find the furthest common piece of the input string
             slicepoint = len(self.__common)
             while (string.find(self.__common[:slicepoint]) != 0):
-                slicepoint = slicepoint - 1
+                slicepoint -= 1
             self.__common = self.__common[:slicepoint]
 
     def getCommon(self):
@@ -26,7 +26,7 @@ if __name__ == '__main__':
         for s in strings:
             fcs.processString(s)
             print ("T%d:%s" % (c, fcs.getCommon()))
-            c = c + 1
+            c += 1
         print("Result:%s" % (fcs.getCommon()))
 
     print("FindCommonStart Tests")
