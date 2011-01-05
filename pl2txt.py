@@ -60,9 +60,12 @@ for playlist in fileList:
     pl = Playlist(playlist)
     for song in pl:
         if song not in songtoplaylists:
-            songtoplaylists[song] = [playlist]
+            songtoplaylists[song] = set([playlist])
         else:
-            songtoplaylists[song].append(playlist)
+            songtoplaylists[song] |= set([playlist])
+
+for s in songtoplaylists:
+    print("%s : %s" % (s, songtoplaylists[s]))
 
 print("Found %d songs" % (len(songtoplaylists)))
 # search for the common start string (path to the original files)
@@ -75,6 +78,18 @@ print("Common Start: %s" % (commonsongstart))
 # remove the common start string from each song entry
 renamesong = lambda songname: songname[len(commonsongstart):]
 newsongtoplaylists = dict((renamesong(key), value) for (key, value) in songtoplaylists.items())
+
+# now we have a set of songs that describe the unique set that each song belongs to
+# from this we can examine each playlist name and work out the child and parent ordering
+
+# NOTE: this is reusing the fileList from the directory walk above and expects it to have not changed
+for playlist in fileList:
+    print(playlist)
+    for s in songtoplaylists:
+        if playlist in songtoplaylists[s]:
+            print("%s IN %s" % (playlist, s))
+
+sys.exit()
 
 # We want to turn each song to playlists in a set
 # then produce a set so that we have a unqiue list of all playlist paths
