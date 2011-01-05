@@ -64,8 +64,8 @@ for playlist in fileList:
         else:
             songtoplaylists[song] |= set([playlist])
 
-for s in songtoplaylists:
-    print("%s : %s" % (s, songtoplaylists[s]))
+#for s in songtoplaylists:
+#    print("%s : %s" % (s, songtoplaylists[s]))
 
 print("Found %d songs" % (len(songtoplaylists)))
 # search for the common start string (path to the original files)
@@ -82,29 +82,42 @@ newsongtoplaylists = dict((renamesong(key), value) for (key, value) in songtopla
 # now we have a set of songs that describe the unique set that each song belongs to
 # from this we can examine each playlist name and work out the child and parent ordering
 
-# NOTE: this is reusing the fileList from the directory walk above and expects it to have not changed
-for playlist in fileList:
-    print(playlist)
-    for s in songtoplaylists:
-        if playlist in songtoplaylists[s]:
-            print("%s IN %s" % (playlist, s))
-
-sys.exit()
-
-# We want to turn each song to playlists in a set
-# then produce a set so that we have a unqiue list of all playlist paths
-# which we can then convert into a tree
-uniqueset = set()
+# choose one song from each set description
+uniquesongtoset = {}
 psetcount = 0
-for playlists in newsongtoplaylists.values():
+for song in newsongtoplaylists.keys():
     psetcount += 1
-    pset = frozenset(playlists)
-    if pset not in uniqueset:
-        uniqueset.add(pset)
+    pset = frozenset(newsongtoplaylists[song])
+    if pset not in uniquesongtoset.values():
+        uniquesongtoset[song] = pset
 print("Playlists sets =", psetcount)
-print("Unique Playlists sets =", len(uniqueset))
+print("Unique Playlists sets =", len(uniquesongtoset))
+
+for p in newsongtoplaylists.values():
+    print(p)
+for p in uniquesongtoset.values():
+    print(p)
+
+# we want to classify the playlists by size
+# use a list [length][playlists,...]
+maxplaylistlength = 0
+for playlists in uniquesongtoset.values():
+    if len(playlists) > maxplaylistlength:
+        maxplaylistlength = len(playlists)
+print("MAXPLAYLISTLENGTH =", maxplaylistlength)
+# classify each node
+playlistslengthtoplaylists = [None] * (maxplaylistlength)
+for i in range(maxplaylistlength):
+    playlistslengthtoplaylists[i] = []
+print(playlistslengthtoplaylists)
+for playlists in uniquesongtoset.values():
+    playlistslengthtoplaylists[len(playlists) - 1].append(playlists)
+
+for i in range(maxplaylistlength):
+    print("L%d:%s" % (i, playlistslengthtoplaylists[i]))
 
 # print out all nodes from the root node
+
 def walktree(rootnode, visit):
     cur = rootnode
     nextChildIndex = 0
@@ -131,26 +144,4 @@ def printnode(node):
         s += '>'
     print("%s%s" % (s, node.getLabel()))
 
-rootnode = NodePlaylist("Root")
-
-# we want to classify the playlists by size
-# use a list [length][playlists,...]
-maxplaylistlength = 0
-for playlists in uniqueset:
-    if len(playlists) > maxplaylistlength:
-        maxplaylistlength = len(playlists)
-print("MAXPLAYLISTLENGTH =", maxplaylistlength)
-
-# we have a root node by default there for maxplaylistslength and the root node
-sizetoplaylists = [None] * (maxplaylistlength + 1)
-for i in range(maxplaylistlength + 1):
-    sizetoplaylists[i] = []
-print(sizetoplaylists)
-for playlists in uniqueset:
-    print(len(playlists))
-    sizetoplaylists[len(playlists)].append(playlists)
-
-for i in range(len(sizetoplaylists)):
-    print("Length %d PLS %s" % (i, sizetoplaylists[i]))
-
-walktree(rootnode, printnode)
+#walktree(rootnode, printnode)
