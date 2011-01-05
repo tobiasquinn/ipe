@@ -4,9 +4,11 @@ class NodePlaylist:
     def __init__(self, label):
         self._label = label
         self._children = []
+        self._depth = 0
 
     def addChild(self, child):
         child.setParent(self)
+        child.setDepth(self._depth + 1)
         self._children.append(child)
 
     def getNumberOfChildren(self):
@@ -28,3 +30,11 @@ class NodePlaylist:
         # return the index of the childNode
         # (used for tree walking)
         return self._children.index(childNode)
+
+    def setDepth(self, depth):
+        for c in self._children:
+            c.setDepth(depth + 1)
+        self._depth = depth
+
+    def getDepth(self):
+        return self._depth
