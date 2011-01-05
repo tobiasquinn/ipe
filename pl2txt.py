@@ -37,12 +37,6 @@ class Playlist:
         self._index -= 1
         return self._songnames[self._index]
 
-
-#pl = Playlist("Jazz Masters 41.m3u")
-#for song in pl:
-#    print(song)
-#sys.exit()
-
 print ("Input directory: %s" % (INPUT_DIR))
 fileList = []
 for root, sub, files in os.walk(INPUT_DIR):
@@ -81,13 +75,6 @@ print("Common Start: %s" % (commonsongstart))
 # remove the common start string from each song entry
 renamesong = lambda songname: songname[len(commonsongstart):]
 newsongtoplaylists = dict((renamesong(key), value) for (key, value) in songtoplaylists.items())
-
-#testsong = ["Diana Krall/Love Scenes [Europe]/11 My Love Is.m4a",
-#           "Compilations/I Hear Music - Cleo Laine & John Dankworth - A Celebration Of Their Life & Work - [Disc 2] John - Big Band & The Movies/2-06 African Waltz.m4a",
-#           "Alicia De Larrocha/Albéniz (I)_ Iberia, Navarra, Suite Española [Disc 2]/2-12 Albéniz (I)_ Suite Española - Castilla (Seguidillas).m4a"]
-#
-#testsong = ["Charlie Christian/Charlie's Dream—The Original Guitar Genius (Disc 2)/2-07 As Long As I Live.m4a",
-#            "Compilations/Flying Home—The Original Guitar Genius (Disc 1)/1-10 AC_DC Current.m4a"]
 
 # We want to turn each song to playlists in a set
 # then produce a set so that we have a unqiue list of all playlist paths
@@ -130,10 +117,25 @@ def printnode(node):
     print("%s%s" % (s, node.getLabel()))
 
 rootnode = NodePlaylist("Root")
-for ps in uniqueset:
-    if len(ps) == 1:
-        rootnode.addChild(NodePlaylist(ps))
-for ps in uniqueset:
-    if len(ps) == 2:
-        rootnode.getChild(0).addChild(NodePlaylist(ps))
+
+# we want to classify the playlists by size
+# use a list [length][playlists,...]
+maxplaylistlength = 0
+for playlists in uniqueset:
+    if len(playlists) > maxplaylistlength:
+        maxplaylistlength = len(playlists)
+print("MAXPLAYLISTLENGTH =", maxplaylistlength)
+
+# we have a root node by default there for maxplaylistslength and the root node
+sizetoplaylists = [None] * (maxplaylistlength + 1)
+for i in range(maxplaylistlength + 1):
+    sizetoplaylists[i] = []
+print(sizetoplaylists)
+for playlists in uniqueset:
+    print(len(playlists))
+    sizetoplaylists[len(playlists)].append(playlists)
+
+for i in range(len(sizetoplaylists)):
+    print("Length %d PLS %s" % (i, sizetoplaylists[i]))
+
 walktree(rootnode, printnode)
