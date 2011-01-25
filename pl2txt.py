@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+# Copyright 2011 Tobias Quinn <tobias@tobiasquinn.com>, GPLv3
+
 # Traverse the directory and read in all playlist to generate a file which has
 # the hierarchy of the playlist described in it
 
