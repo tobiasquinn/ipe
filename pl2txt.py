@@ -56,6 +56,7 @@ songtoplaylists = {}
 
 # map songs to all the playlists they are in
 # this is done by creating a dictionary of songname to playlist name
+# FIXME: How to deal with songs in more than one playlist...
 for playlist in fileList:
     pl = Playlist(playlist)
     for song in pl:
@@ -64,8 +65,8 @@ for playlist in fileList:
         else:
             songtoplaylists[song] |= set([playlist])
 
-#for s in songtoplaylists:
-#    print("%s : %s" % (s, songtoplaylists[s]))
+for s in songtoplaylists:
+    print("%s : %s" % (s, songtoplaylists[s]))
 
 print("Found %d songs" % (len(songtoplaylists)))
 # search for the common start string (path to the original files)
@@ -115,6 +116,18 @@ for playlists in uniquesongtoset.values():
 
 for i in range(maxplaylistlength):
     print("L%d:%s" % (i, playlistslengthtoplaylists[i]))
+
+# create nodes for all our playlists
+labeltonode = {}
+for bigindex, pls in enumerate(playlistslengthtoplaylists):
+    for s in playlistslengthtoplaylists[bigindex]:
+        print("%d %s" % (bigindex, s))
+        parentset = set(s)
+        for t in playlistslengthtoplaylists[bigindex + 1]:
+            print("Test against:", t)
+#        while parentset:
+#            pl = parentset.pop()
+#            print("PL: ", pl)
 
 # print out all nodes from the root node
 

@@ -1,0 +1,7 @@
+Automator scripts on MAC?
+COM interface on windows?
+
+Using the itunes playlist export to do an export of all playlists, playlist folders with no playlists in them cannot be restored as the exporter does not transport the information to any file as the playlist is empty
+
+The working out of the tree structure needs to be done by using sets
+
